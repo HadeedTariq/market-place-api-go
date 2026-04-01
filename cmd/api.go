@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/HadeedTariq/market-place-api-go/internal/auth"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -23,6 +24,9 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("all good"))
 	})
 
+	authService := auth.NewService()
+	authHandler := auth.NewHandler(authService)
+	r.Post("/auth/register-user", authHandler.RegisterUser)
 	return r
 }
 
