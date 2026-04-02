@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	repo "github.com/HadeedTariq/market-place-api-go/internal/adapters/postgresql/sqlc"
 	"github.com/HadeedTariq/market-place-api-go/internal/auth"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -24,7 +25,7 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("all good"))
 	})
 
-	authService := auth.NewService()
+	authService := auth.NewService(repo.New(app.db))
 	authHandler := auth.NewHandler(authService)
 	r.Post("/auth/register-user", authHandler.RegisterUser)
 	return r
