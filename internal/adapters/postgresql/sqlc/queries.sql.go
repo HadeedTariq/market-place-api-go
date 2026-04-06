@@ -7,8 +7,6 @@ package repo
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const findExistingUserByEmail = `-- name: FindExistingUserByEmail :one
@@ -37,13 +35,13 @@ INSERT INTO users (
 `
 
 type InsertUserParams struct {
-	UserName     pgtype.Text `json:"user_name"`
-	Email        string      `json:"email"`
-	PasswordHash pgtype.Text `json:"password_hash"`
-	Role         pgtype.Text `json:"role"`
-	Source       pgtype.Text `json:"source"`
-	CountryCode  pgtype.Text `json:"country_code"`
-	Gender       pgtype.Text `json:"gender"`
+	UserName     string `json:"user_name"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"password_hash"`
+	Role         string `json:"role"`
+	Source       string `json:"source"`
+	CountryCode  string `json:"country_code"`
+	Gender       string `json:"gender"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
