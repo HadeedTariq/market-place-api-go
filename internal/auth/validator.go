@@ -16,11 +16,12 @@ type RegisterRequest struct {
 
 var validate *validator.Validate
 
-func InitValidator() {
+func InitValidator() *validator.Validate {
 	validate = validator.New()
 
 	validate.RegisterValidation("username", validateUsername)
 	validate.RegisterValidation("strong_password", validatePassword)
+	return validate
 }
 
 func validateUsername(fl validator.FieldLevel) bool {

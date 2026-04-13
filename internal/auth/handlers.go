@@ -14,17 +14,18 @@ import (
 )
 
 type handler struct {
-	service Service
+	service   Service
+	validator *validator.Validate
 }
 
-func NewHandler(authService Service) *handler {
+func NewHandler(authService Service, validator *validator.Validate) *handler {
 	return &handler{
-		service: authService,
+		service:   authService,
+		validator: validator,
 	}
 }
 
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	// ~ so first of all have to integrate some validation process in to that
 	var req RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -38,7 +39,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = validate.Struct(req)
+	err = h.validator.Struct(req)
 
 	if err != nil {
 		var validationErrors validator.ValidationErrors

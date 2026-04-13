@@ -25,8 +25,9 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("all good"))
 	})
 
+	authValidator := auth.InitValidator()
 	authService := auth.NewService(repo.New(app.db))
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, authValidator)
 	r.Post("/auth/register-user", authHandler.RegisterUser)
 	return r
 }
