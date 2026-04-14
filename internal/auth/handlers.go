@@ -8,20 +8,23 @@ import (
 
 	utils "github.com/HadeedTariq/market-place-api-go/internal"
 	repo "github.com/HadeedTariq/market-place-api-go/internal/adapters/postgresql/sqlc"
+	"github.com/HadeedTariq/market-place-api-go/internal/mail"
 	"github.com/HadeedTariq/market-place-api-go/internal/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 )
 
 type handler struct {
-	service   Service
-	validator *validator.Validate
+	service      Service
+	validator    *validator.Validate
+	emailService *mail.EmailService
 }
 
-func NewHandler(authService Service, validator *validator.Validate) *handler {
+func NewHandler(authService Service, validator *validator.Validate, emailService *mail.EmailService) *handler {
 	return &handler{
-		service:   authService,
-		validator: validator,
+		service:      authService,
+		validator:    validator,
+		emailService: emailService,
 	}
 }
 
@@ -108,7 +111,6 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 			Status:  500,
 		})
 		return
-
 	}
 
 	err = h.service.InsertUser(r.Context(), repo.InsertUserParams{
@@ -129,7 +131,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJson(w, http.StatusCreated, types.ErrorResponse{
-		Message: "User registered successfully",
+		Message: "Otp send on your email please verify to register",
 		Status:  201,
 	})
 }

@@ -10,6 +10,7 @@ import (
 
 type Querier interface {
 	FindExistingUserByEmail(ctx context.Context, email string) (int32, error)
+	InsertEmailOtp(ctx context.Context, arg InsertEmailOtpParams) error
 	InsertUser(ctx context.Context, arg InsertUserParams) error
 }
 

@@ -13,3 +13,6 @@ INSERT INTO users (
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7
 );
+
+-- name: InsertEmailOtp :exec
+INSERT INTO email_otps (email, otp, expires_at) VALUES ($1, $2, $3);

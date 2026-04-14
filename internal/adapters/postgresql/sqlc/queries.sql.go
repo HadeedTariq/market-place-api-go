@@ -7,6 +7,8 @@ package repo
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const findExistingUserByEmail = `-- name: FindExistingUserByEmail :one
@@ -18,6 +20,21 @@ func (q *Queries) FindExistingUserByEmail(ctx context.Context, email string) (in
 	var column_1 int32
 	err := row.Scan(&column_1)
 	return column_1, err
+}
+
+const insertEmailOtp = `-- name: InsertEmailOtp :exec
+INSERT INTO email_otps (email, otp, expires_at) VALUES ($1, $2, $3)
+`
+
+type InsertEmailOtpParams struct {
+	Email     string             `json:"email"`
+	Otp       string             `json:"otp"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
+func (q *Queries) InsertEmailOtp(ctx context.Context, arg InsertEmailOtpParams) error {
+	_, err := q.db.Exec(ctx, insertEmailOtp, arg.Email, arg.Otp, arg.ExpiresAt)
+	return err
 }
 
 const insertUser = `-- name: InsertUser :exec
@@ -35,13 +52,13 @@ INSERT INTO users (
 `
 
 type InsertUserParams struct {
-	UserName     string `json:"user_name"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"password_hash"`
-	Role         string `json:"role"`
-	Source       string `json:"source"`
-	CountryCode  string `json:"country_code"`
-	Gender       string `json:"gender"`
+	UserName     pgtype.Text `json:"user_name"`
+	Email        string      `json:"email"`
+	PasswordHash pgtype.Text `json:"password_hash"`
+	Role         pgtype.Text `json:"role"`
+	Source       pgtype.Text `json:"source"`
+	CountryCode  pgtype.Text `json:"country_code"`
+	Gender       pgtype.Text `json:"gender"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
