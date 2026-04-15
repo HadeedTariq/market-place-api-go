@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"crypto/rand"
 	"encoding/json"
+	"math/big"
 	"net/http"
 	"os"
 
@@ -31,4 +33,19 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func GenerateOTP(length int) (string, error) {
+	const digits = "0123456789"
+	otp := make([]byte, length)
+
+	for i := range otp {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(digits))))
+		if err != nil {
+			return "", err
+		}
+		otp[i] = digits[num.Int64()]
+	}
+
+	return string(otp), nil
 }

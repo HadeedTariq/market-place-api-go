@@ -1,5 +1,5 @@
 -- name: FindExistingUserByEmail :one
-select 1 from users where email = $1;
+select is_verified from users where email = $1;
 
 -- name: InsertUser :exec
 INSERT INTO users (

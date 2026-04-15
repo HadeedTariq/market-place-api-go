@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	utils "github.com/HadeedTariq/market-place-api-go/internal"
 	repo "github.com/HadeedTariq/market-place-api-go/internal/adapters/postgresql/sqlc"
@@ -12,6 +13,7 @@ import (
 	"github.com/HadeedTariq/market-place-api-go/internal/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type handler struct {
@@ -81,28 +83,23 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	existingUser, err := h.service.FindExistingUserByEmail(r.Context(), req.Email)
 
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			existingUser = 0
-		} else {
-			log.Println(err)
-			utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
-				Message: "Internal Server Error",
-				Status:  500,
-			})
-			return
-		}
+	if err != nil && err != pgx.ErrNoRows {
+		log.Println(err)
+		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
+			Message: "Internal Server Error",
+			Status:  500,
+		})
+		return
 	}
 
-	if existingUser > 0 {
+	if existingUser != nil {
 		utils.WriteJson(w, http.StatusBadRequest, types.ErrorResponse{
-			Message: "Already exist user with this email",
+			Message: "User already exists with this email",
 			Status:  400,
 		})
 		return
 	}
 
-	// ~ so now for the simplicity have to create the user with in the database
 	hashedPassword, err := utils.HashPassword(req.Password)
 
 	if err != nil {
@@ -113,14 +110,54 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	role := "user"
+	source := "general"
+
 	err = h.service.InsertUser(r.Context(), repo.InsertUserParams{
-		UserName:     req.UserName,
+		UserName:     &req.UserName,
 		Email:        req.Email,
-		PasswordHash: hashedPassword,
-		Role:         "user",
-		Gender:       req.Gender,
-		Source:       "general",
+		PasswordHash: &hashedPassword,
+		Role:         &role,
+		Gender:       &req.Gender,
+		Source:       &source,
 	})
+
+	if err != nil {
+		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
+			Message: err.Error(),
+			Status:  500,
+		})
+		return
+	}
+	otp, err := utils.GenerateOTP(6)
+
+	if err != nil {
+		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
+			Message: err.Error(),
+			Status:  500,
+		})
+		return
+	}
+	expiresAt := time.Now().Add(5 * time.Minute)
+
+	err = h.service.InsertEmailOtp(r.Context(), repo.InsertEmailOtpParams{
+		Email: req.Email,
+		Otp:   otp,
+		ExpiresAt: pgtype.Timestamptz{
+			Time:  expiresAt,
+			Valid: true,
+		},
+	})
+
+	if err != nil {
+		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
+			Message: err.Error(),
+			Status:  500,
+		})
+		return
+	}
+
+	err = h.emailService.SendOtpEmail(req.Email, otp, 5)
 
 	if err != nil {
 		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{

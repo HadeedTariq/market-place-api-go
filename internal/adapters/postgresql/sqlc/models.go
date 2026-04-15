@@ -18,18 +18,18 @@ type EmailOtp struct {
 
 type User struct {
 	ID           pgtype.UUID        `json:"id"`
-	UserName     pgtype.Text        `json:"user_name"`
+	UserName     *string            `json:"user_name"`
 	Email        string             `json:"email"`
-	PasswordHash pgtype.Text        `json:"password_hash"`
-	Role         pgtype.Text        `json:"role"`
-	Source       pgtype.Text        `json:"source"`
-	CountryCode  pgtype.Text        `json:"country_code"`
-	IsVerified   pgtype.Bool        `json:"is_verified"`
-	IsActive     pgtype.Bool        `json:"is_active"`
-	Image        pgtype.Text        `json:"image"`
-	Gender       pgtype.Text        `json:"gender"`
-	RefreshToken pgtype.Text        `json:"refresh_token"`
-	IsBan        pgtype.Bool        `json:"is_ban"`
+	PasswordHash *string            `json:"password_hash"`
+	Role         *string            `json:"role"`
+	Source       *string            `json:"source"`
+	CountryCode  *string            `json:"country_code"`
+	IsVerified   *bool              `json:"is_verified"`
+	IsActive     *bool              `json:"is_active"`
+	Image        *string            `json:"image"`
+	Gender       *string            `json:"gender"`
+	RefreshToken *string            `json:"refresh_token"`
+	IsBan        *bool              `json:"is_ban"`
 	CreatedAt    pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
 }

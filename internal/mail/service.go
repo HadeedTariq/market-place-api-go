@@ -8,12 +8,12 @@ func NewEmailService(m *Mailer) *EmailService {
 	return &EmailService{mailer: m}
 }
 
-func (s *EmailService) SendWelcomeEmail(to string, name string) error {
-	body := WelcomeTemplate(name)
+func (s *EmailService) SendOtpEmail(to string, otp string, expiryMinutes int) error {
+	body := OTPTemplate("Accoswap", otp, expiryMinutes)
 
 	return s.mailer.Send(
 		to,
-		"Welcome to Our Platform",
+		"One time OTP for Accoswap",
 		body,
 	)
 }

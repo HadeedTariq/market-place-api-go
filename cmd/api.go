@@ -34,7 +34,7 @@ func (app *application) mount() http.Handler {
 	senderPort := utils.GetEnv("MAIL_SENDER_PORT", "587")
 	senderPortInt, _ := strconv.Atoi(senderPort)
 
-	mailSenderService := mail.NewMailer(senderHost, senderPortInt, senderUsername, senderPassword, "computeranalog351@gmail.com")
+	mailSenderService := mail.NewMailer(senderHost, senderPortInt, senderUsername, senderPassword, "test-nrw7gym0j1jg2k8e.mlsender.net")
 
 	emailService := mail.NewEmailService(mailSenderService)
 	authValidator := auth.InitValidator()

@@ -12,14 +12,14 @@ import (
 )
 
 const findExistingUserByEmail = `-- name: FindExistingUserByEmail :one
-select 1 from users where email = $1
+select is_verified from users where email = $1
 `
 
-func (q *Queries) FindExistingUserByEmail(ctx context.Context, email string) (int32, error) {
+func (q *Queries) FindExistingUserByEmail(ctx context.Context, email string) (*bool, error) {
 	row := q.db.QueryRow(ctx, findExistingUserByEmail, email)
-	var column_1 int32
-	err := row.Scan(&column_1)
-	return column_1, err
+	var is_verified *bool
+	err := row.Scan(&is_verified)
+	return is_verified, err
 }
 
 const insertEmailOtp = `-- name: InsertEmailOtp :exec
@@ -52,13 +52,13 @@ INSERT INTO users (
 `
 
 type InsertUserParams struct {
-	UserName     pgtype.Text `json:"user_name"`
-	Email        string      `json:"email"`
-	PasswordHash pgtype.Text `json:"password_hash"`
-	Role         pgtype.Text `json:"role"`
-	Source       pgtype.Text `json:"source"`
-	CountryCode  pgtype.Text `json:"country_code"`
-	Gender       pgtype.Text `json:"gender"`
+	UserName     *string `json:"user_name"`
+	Email        string  `json:"email"`
+	PasswordHash *string `json:"password_hash"`
+	Role         *string `json:"role"`
+	Source       *string `json:"source"`
+	CountryCode  *string `json:"country_code"`
+	Gender       *string `json:"gender"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
