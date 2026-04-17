@@ -100,6 +100,24 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	existingOtp, err := h.service.FindExistingOtp(r.Context(), req.Email)
+
+	if err != nil && err != pgx.ErrNoRows {
+		log.Println(err)
+		utils.WriteJson(w, http.StatusInternalServerError, types.ErrorResponse{
+			Message: "Internal Server Error",
+			Status:  500,
+		})
+		return
+	}
+
+	if existingOtp > 0 {
+		utils.WriteJson(w, http.StatusBadRequest, types.ErrorResponse{
+			Message: "Otp Already send",
+			Status:  400,
+		})
+		return
+	}
 	hashedPassword, err := utils.HashPassword(req.Password)
 
 	if err != nil {

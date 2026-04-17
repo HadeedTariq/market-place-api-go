@@ -1,6 +1,10 @@
 package mail
 
-import "gopkg.in/gomail.v2"
+import (
+	"fmt"
+
+	"gopkg.in/gomail.v2"
+)
 
 type Mailer struct {
 	dialer *gomail.Dialer
@@ -19,7 +23,7 @@ func NewMailer(host string, port int, username, password, from string) *Mailer {
 func (m *Mailer) Send(to, subject, body string) error {
 	msg := gomail.NewMessage()
 
-	msg.SetHeader("From", m.from)
+	msg.SetHeader("From", fmt.Sprintf("EscrawSwap <%s>", m.from))
 	msg.SetHeader("To", to)
 	msg.SetHeader("Subject", subject)
 

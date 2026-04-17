@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const findExistingOtp = `-- name: FindExistingOtp :one
+SELECT 1 FROM email_otps WHERE email = $1 AND expires_at > NOW()
+`
+
+func (q *Queries) FindExistingOtp(ctx context.Context, email string) (int32, error) {
+	row := q.db.QueryRow(ctx, findExistingOtp, email)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const findExistingUserByEmail = `-- name: FindExistingUserByEmail :one
 select is_verified from users where email = $1
 `

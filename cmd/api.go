@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	utils "github.com/HadeedTariq/market-place-api-go/internal"
@@ -28,13 +27,16 @@ func (app *application) mount() http.Handler {
 		w.Write([]byte("all good"))
 	})
 
-	senderUsername := utils.GetEnv("MAIL_SENDER_USERNAME", "apikey")          // For SendGrid, this is usually "apikey"
-	senderPassword := utils.GetEnv("MAIL_SENDER_PASSWORD", "your_sg_api_key") // Your actual API Key
-	senderHost := utils.GetEnv("MAIL_SENDER_SERVER", "smtp.sendgrid.net")
-	senderPort := utils.GetEnv("MAIL_SENDER_PORT", "587")
-	senderPortInt, _ := strconv.Atoi(senderPort)
+	senderUsername := utils.GetEnv("MAILER_USER", "")
+	senderPassword := utils.GetEnv("MAILER_PASSWORD", "")
 
-	mailSenderService := mail.NewMailer(senderHost, senderPortInt, senderUsername, senderPassword, "test-nrw7gym0j1jg2k8e.mlsender.net")
+	mailSenderService := mail.NewMailer(
+		"smtp.gmail.com",
+		587,
+		senderUsername,
+		senderPassword,
+		senderUsername,
+	)
 
 	emailService := mail.NewEmailService(mailSenderService)
 	authValidator := auth.InitValidator()

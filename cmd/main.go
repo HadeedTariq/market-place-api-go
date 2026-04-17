@@ -32,6 +32,13 @@ func main() {
 		panic(err)
 	}
 
+	// commandTag, err := conn.Exec(ctx, "delete from users where role = 'user'")
+
+	// if err != nil {
+	// 	log.Printf("Update failed: %v", err)
+	// }
+	// fmt.Printf("Rows affected: %d\n", commandTag.RowsAffected())
+
 	defer conn.Close(ctx)
 
 	logger.Info("connected to database", "dsn", cfg.dbConfig.dsn)
