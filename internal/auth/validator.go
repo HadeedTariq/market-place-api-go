@@ -14,14 +14,22 @@ type RegisterRequest struct {
 	CountryCode string `json:"country_code" validate:"required,len=2,uppercase"`
 }
 
-var validate *validator.Validate
+type EmailOtpRequest struct {
+	Email string `json:"email" validate:"required,email"`
+	Otp   string `json:"otp" validate:"required,len=6,numeric"`
+}
+
+func ValidateRequest(v *validator.Validate, payload interface{}) error {
+	return v.Struct(payload)
+}
 
 func InitValidator() *validator.Validate {
-	validate = validator.New()
+	v := validator.New()
 
-	validate.RegisterValidation("username", validateUsername)
-	validate.RegisterValidation("strong_password", validatePassword)
-	return validate
+	v.RegisterValidation("username", validateUsername)
+	v.RegisterValidation("strong_password", validatePassword)
+
+	return v
 }
 
 func validateUsername(fl validator.FieldLevel) bool {

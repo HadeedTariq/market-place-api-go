@@ -43,6 +43,8 @@ func (app *application) mount() http.Handler {
 	authService := auth.NewService(repo.New(app.db))
 	authHandler := auth.NewHandler(authService, authValidator, emailService)
 	r.Post("/auth/register-user", authHandler.RegisterUser)
+	r.Post("/auth/email-otp-checker", authHandler.OtpEmailChecker)
+
 	return r
 }
 

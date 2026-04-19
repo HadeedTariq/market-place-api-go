@@ -44,7 +44,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.validator.Struct(req)
+	err = ValidateRequest(h.validator, &req)
 
 	if err != nil {
 		var validationErrors validator.ValidationErrors
@@ -189,4 +189,9 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		Message: "Otp send on your email please verify to register",
 		Status:  201,
 	})
+}
+
+func (h *handler) OtpEmailChecker(w http.ResponseWriter, r *http.Request) {
+	// ~ so over there have to create the validator for that
+
 }
