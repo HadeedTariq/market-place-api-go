@@ -192,6 +192,59 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) OtpEmailChecker(w http.ResponseWriter, r *http.Request) {
+	var req EmailOtpRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		log.Println(err)
+		utils.WriteJson(w, http.StatusBadRequest, types.ErrorResponse{
+			Message: "Invalid request body",
+			Status:  404,
+		})
+		return
+	}
+
 	// ~ so over there have to create the validator for that
+	err = ValidateRequest(h.validator, &req)
+
+	if err != nil {
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
+			customErrors := make(map[string]string)
+			for _, e := range validationErrors {
+				field := e.Field()
+				switch field {
+				case "Email":
+					customErrors["email"] = "Invalid email format"
+				case "Otp":
+					customErrors["otp"] = "Invalid otp format"
+				}
+			}
+			utils.WriteJson(w, http.StatusBadRequest, map[string]interface{}{
+				"errors": customErrors,
+			})
+			return
+		} else {
+			utils.WriteJson(w, http.StatusBadRequest, types.ErrorResponse{
+				Message: "Invalid request",
+				Status:  400,
+			})
+			return
+		}
+	}
+
+	correctOtp, err := h.service.CheckOtp(r.Context(), repo.CheckOtpParams{
+		Email: req.Email,
+		Otp:   req.Otp,
+	})
+
+	if correctOtp < 1 {
+		utils.WriteJson(w, http.StatusBadRequest, types.ErrorResponse{
+			Message: "Otp not correct",
+			Status:  400,
+		})
+		return
+	}
 
 }

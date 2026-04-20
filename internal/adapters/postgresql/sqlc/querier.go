@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CheckOtp(ctx context.Context, arg CheckOtpParams) (int32, error)
 	FindExistingOtp(ctx context.Context, email string) (int32, error)
 	FindExistingUserByEmail(ctx context.Context, email string) (*bool, error)
 	InsertEmailOtp(ctx context.Context, arg InsertEmailOtpParams) error

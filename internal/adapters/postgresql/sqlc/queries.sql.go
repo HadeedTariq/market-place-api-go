@@ -11,6 +11,28 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const checkOtp = `-- name: CheckOtp :one
+SELECT 1 
+FROM email_otps 
+WHERE email = $1 
+  AND otp = $2
+  AND expires_at > NOW()
+ORDER BY created_at DESC 
+LIMIT 1
+`
+
+type CheckOtpParams struct {
+	Email string `json:"email"`
+	Otp   string `json:"otp"`
+}
+
+func (q *Queries) CheckOtp(ctx context.Context, arg CheckOtpParams) (int32, error) {
+	row := q.db.QueryRow(ctx, checkOtp, arg.Email, arg.Otp)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const findExistingOtp = `-- name: FindExistingOtp :one
 SELECT 1 FROM email_otps WHERE email = $1 AND expires_at > NOW()
 `

@@ -11,6 +11,7 @@ type Service interface {
 	InsertUser(ctx context.Context, arg repo.InsertUserParams) error
 	InsertEmailOtp(ctx context.Context, arg repo.InsertEmailOtpParams) error
 	FindExistingOtp(ctx context.Context, email string) (int32, error)
+	CheckOtp(ctx context.Context, arg repo.CheckOtpParams) (int32, error)
 }
 
 type svc struct {
@@ -37,4 +38,8 @@ func (s *svc) InsertEmailOtp(ctx context.Context, arg repo.InsertEmailOtpParams)
 
 func (s *svc) FindExistingOtp(ctx context.Context, email string) (int32, error) {
 	return s.repo.FindExistingOtp(ctx, email)
+}
+
+func (s *svc) CheckOtp(ctx context.Context, arg repo.CheckOtpParams) (int32, error) {
+	return s.repo.CheckOtp(ctx, arg)
 }
